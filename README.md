@@ -1,2 +1,3 @@
-# api-ariary-sdk
+# API ARIARY SDK
+
 SDK Library for API Ariary
