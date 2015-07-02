@@ -1,0 +1,23 @@
+{
+    "name": "interactiveopensource/api-ariary-sdk",
+    "type": "sdk",
+    "description": "SDK Library for API Ariary",
+    "keywords": ["api ariary", "http", "sdk", "rest"],
+    "homepage": "http://www.ariary.mg/sdk",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Interactive (c) Solutions",
+            "email":"contact@irzhy.me",
+            "homepage": "http://irzhy.me/"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle" : "5.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "ApiAriary\\": "src/"
+        }
+    }
+}
