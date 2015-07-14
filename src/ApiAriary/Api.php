@@ -51,15 +51,19 @@ class Api {
      */
     private $http;
 
-    public function __construct($client_id, $client_secret, $domain = null){
+    public function __construct($client_id, $client_secret, $domain = null, $option = array()){
 
         $this->clientId = $client_id;
         $this->clientSecret = $client_secret;
         $this->domain = $domain;
 
+        $option = array_merge(array(
+            'storage' => dirname(dirname(dirname(__FILE__))) . '/storage',
+        ), $option);
+
         //Set storage Dependancy
         $this->setStorage(
-            new TokenStorage($client_secret, dirname(dirname(dirname(__FILE__))) . '/storage')
+            new TokenStorage($client_secret, $option['storage'])
         );
 
         //retrieve session token
