@@ -1,6 +1,7 @@
 <?php namespace ApiAriary;
 
 
+use ApiAriary\Component\StorageInterface;
 use GuzzleHttp\Event\BeforeEvent;
 use GuzzleHttp\Event\CompleteEvent;
 use GuzzleHttp\Event\ErrorEvent;
@@ -21,6 +22,7 @@ class OAuthExchange implements SubscriberInterface{
     protected $clientId;
     protected $clientSecret;
     protected $token;
+    protected $storage;
 
     public function getEvents(){
         return [
@@ -84,8 +86,7 @@ class OAuthExchange implements SubscriberInterface{
         $token = json_decode($response->getBody()->getContents(), true);
 
         //store token
-        $storage = new TokenStorage($this->clientSecret, dirname(dirname(dirname(__FILE__))) . '/storage');
-        $storage->store($this->clientId, $token['access_token']);
+        $this->storage->store($this->clientId, $token['access_token']);
 
         //set token information to header
         $e->getRequest()->setHeader('Authorization', 'Bearer ' . $token['access_token']);
@@ -99,10 +100,11 @@ class OAuthExchange implements SubscriberInterface{
      * @param $token
      * @return $this
      */
-    public function setClientOptions($clientId, $clientSecret, $token){
+    public function setClientOptions(StorageInterface $storage, $clientId, $clientSecret, $token){
         $this->clientId = $clientId;
         $this->clientSecret = $clientSecret;
         $this->token = $token;
+        $this->storage = $storage;
 
         return $this;
     }

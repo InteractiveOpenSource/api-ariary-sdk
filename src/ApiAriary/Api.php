@@ -126,7 +126,7 @@ class Api {
     public function setClient(HttpClient $http){
 
         $oauth = new OAuthExchange();
-        $oauth->setClientOptions($this->clientId, $this->clientSecret, $this->getToken());
+        $oauth->setClientOptions($this->storage, $this->clientId, $this->clientSecret, $this->getToken());
 
         $http->getEmitter()->attach($oauth);
 
