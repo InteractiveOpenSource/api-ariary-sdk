@@ -32,15 +32,24 @@ class OAuthExchange implements SubscriberInterface{
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function onBefore(BeforeEvent $e, $name){
         //@todo : vérifie nullité des paramètres client (client_id, client_secret) => stop si null ou vide
         //echo($e->getRequest());
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function onComplete(CompleteEvent $e, $name){
         //echo "\n";
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function onError(ErrorEvent $e, $name){
 
         if(!is_object($e) || !is_object($e->getResponse()))
@@ -62,6 +71,13 @@ class OAuthExchange implements SubscriberInterface{
         }
     }
 
+    /**
+    * Build url with sufix
+    *
+    * @param $e
+    * @param $path string uri Sufix
+    * @return string
+    */
     protected function getUri($e, $path = null){
         $uri = sprintf("%s://%s",
             $e->getRequest()->getScheme(),

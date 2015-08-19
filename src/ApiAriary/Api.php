@@ -16,10 +16,22 @@ use ApiAriary\Component\StorageInterface as Storage;
  */
 class Api {
 
+    /**
+     * API Ariary client_id
+     * @var string
+     */
     protected $clientId;
 
+    /**
+     * API Ariary client_secret
+     * @var string
+     */
     protected $clientSecret;
 
+    /**
+     * API Ariary authorized domain
+     * @var null
+     */
     protected $domain;
 
     /**
