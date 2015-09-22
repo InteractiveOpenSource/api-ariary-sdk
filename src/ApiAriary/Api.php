@@ -16,6 +16,8 @@ use ApiAriary\Component\StorageInterface as Storage;
  */
 class Api {
 
+    const API_URL = 'http://api.ariary.dev/';
+
     /**
      * API Ariary client_id
      * @var string
@@ -54,7 +56,7 @@ class Api {
      *
      * @var array
      */
-    protected $options = [];
+    protected $httpOptions = [];
 
     /**
      * HTTP Client
@@ -62,6 +64,13 @@ class Api {
      * @var HttpClient
      */
     private $http;
+
+    /**
+     * API Options
+     *
+     * @var array
+     */
+    protected $options = [];
 
     public function __construct($client_id, $client_secret, $domain = null, $option = array()){
 
@@ -71,7 +80,10 @@ class Api {
 
         $option = array_merge(array(
             'storage' => dirname(dirname(dirname(__FILE__))) . '/storage',
+            'errtime' => 5,
         ), $option);
+
+        $this->options = $option;
 
         //Set storage Dependancy
         $this->setStorage(
@@ -82,7 +94,7 @@ class Api {
         $this->token = $this->getToken();
 
         //default client options
-        $this->options = [
+        $this->httpOptions = [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token
             ],
@@ -99,7 +111,7 @@ class Api {
      * @return \GuzzleHttp\Message\ResponseInterface
      */
     public function get($uri, $options = []){
-        return $this->http->get($uri, array_merge($this->options,
+        return $this->http->get(self::API_URL . $uri, array_merge($this->httpOptions,
             $options
         ));
     }
@@ -112,7 +124,7 @@ class Api {
      * @return \GuzzleHttp\Message\ResponseInterface
      */
     public function post($uri, $options = []){
-        return $this->http->post($uri, array_merge($this->options,
+        return $this->http->post(self::API_URL . $uri, array_merge($this->httpOptions,
             $options
         ));
     }
@@ -125,7 +137,7 @@ class Api {
      * @return \GuzzleHttp\Message\ResponseInterface
      */
     public function head($uri, $options){
-        return $this->http->head($uri, array_merge($this->options,
+        return $this->http->head(self::API_URL . $uri, array_merge($this->httpOptions,
             $options
         ));
     }
@@ -138,7 +150,13 @@ class Api {
     public function setClient(HttpClient $http){
 
         $oauth = new OAuthExchange();
-        $oauth->setClientOptions($this->storage, $this->clientId, $this->clientSecret, $this->getToken());
+        $oauth->setClientOptions(
+            $this->storage,
+            $this->clientId,
+            $this->clientSecret,
+            $this->getToken(),
+            $this->getOption('errtime', 5)
+        );
 
         $http->getEmitter()->attach($oauth);
 
@@ -161,5 +179,16 @@ class Api {
      */
     public function getToken(){
         return $this->storage->retrieve($this->clientId);
+    }
+
+    /**
+     * Retrieve option by key
+     *
+     * @param $key
+     * @param null $default
+     * @return null
+     */
+    public function getOption($key, $default = null){
+        return array_key_exists($key, $this->options) ? $this->options[$key] : $default;
     }
 } 

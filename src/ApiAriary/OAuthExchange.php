@@ -23,6 +23,8 @@ class OAuthExchange implements SubscriberInterface{
     protected $clientSecret;
     protected $token;
     protected $storage;
+    protected $errtime;
+    private $errtimeReal = 0;
 
     public function getEvents(){
         return [
@@ -55,9 +57,13 @@ class OAuthExchange implements SubscriberInterface{
         if(!is_object($e) || !is_object($e->getResponse()))
             throw new \ErrorException('Error System', 500);
 
+        if($this->errtimeReal == $this->errtime){
+            throw new \RuntimeException("Too much initiative. You've tried {$this->errtime} times to request but no success", 503);
+        }
+
         //Intercept OAuth restriction : 401 OAuth Restriction, Unauthorized requaest
         if ($e->getResponse()->getStatusCode() == 401) {
-
+            $this->errtimeReal++;
             //Token Access Request
             $this->performOAuth($e, [
                 'grant_type' => 'client_credentials',
@@ -111,16 +117,20 @@ class OAuthExchange implements SubscriberInterface{
     /**
      * Set client configurations
      *
+     * @param StorageInterface $storage
      * @param $clientId
      * @param $clientSecret
      * @param $token
+     * @param $errtime
+     *
      * @return $this
      */
-    public function setClientOptions(StorageInterface $storage, $clientId, $clientSecret, $token){
+    public function setClientOptions(StorageInterface $storage, $clientId, $clientSecret, $token, $errtime = 5){
+        $this->storage = $storage;
         $this->clientId = $clientId;
         $this->clientSecret = $clientSecret;
         $this->token = $token;
-        $this->storage = $storage;
+        $this->errtime = $errtime;
 
         return $this;
     }
